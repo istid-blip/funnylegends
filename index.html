@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sønnens Kunstgalleri</title>
+    <title>Funny Legends</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f9;
+            background-color: #ffffff3a;
             color: #333;
             margin: 0;
             padding: 20px;
@@ -21,7 +21,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
-            max-width: 1100px;
+            max-width: 500px;
             margin: 0 auto;
             padding: 0 20px;
         }
@@ -34,7 +34,7 @@
             transition: transform 0.3s ease;
         }
 
-        .artwork:hover { transform: translateY(-5px); }
+        .artwork:hover { transform: scale(1.01); }
 
         .artwork img {
             width: 100%;
@@ -43,44 +43,180 @@
         }
 
         .artwork-title { margin: 15px 0 5px 0; font-size: 1.2em; font-weight: bold; }
-        .artwork-date { font-size: 0.9em; color: #888; margin: 0; }
+        .artwork-date { font-size: 0.9em; color: #888; margin: 0; margin-bottom: 15px; }
+        
+        .reactions {
+            display: none; /* Skjuler knappene. Bytt til 'flex' når du vil vise dem igjen! */
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .reaction-btn {
+            background: #f0f0f0;
+            border: none;
+            border-radius: 20px;
+            padding: 6px 12px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reaction-btn:hover { background: #e8e8e8; transform: translateY(-2px); }
+        .reaction-btn span { font-weight: bold; color: #555; }
+        
+        /* Aktive stiler når brukeren har trykket */
+        .active-heart { background: #ffebee !important; border: 1px solid #ffcdd2; }
+        .active-thumb { background: #e3f2fd !important; border: 1px solid #bbdefb; }
+
+        .main-footer {
+    margin-top: 50px;
+    padding: 20px;
+    border-top: 1px solid #eee;
+    font-size: 0.9em;
+    color: #888;
+}
+
+.footer-content {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-nav a {
+    color: #666;
+    text-decoration: none;
+    margin: 0 10px;
+    transition: color 0.2s;
+}
+
+.footer-nav a:hover {
+    color: #2c3e50;
+    text-decoration: underline;
+}
     </style>
 </head>
 <body>
 
-    <h1>🎨 Kunstgalleriet 🎨</h1>
-    <p class="intro-text">En dynamisk samling av mesterverk</p>
+    <h1>🎨 Funny Legends 🎨</h1>
+    <p class="intro-text">My collection of funny legends</p>
 
     <div class="gallery" id="kunst-galleri"></div>
 
-    <script>
-        // Funksjon som henter data fra JSON-filen
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        // Your web app's Firebase configuration
+
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyDHI0z10pfh0mDOjNeqBud07QXdIgy0cM4",
+
+            authDomain: "funny-legends.firebaseapp.com",
+
+            databaseURL: "https://funny-legends-default-rtdb.europe-west1.firebasedatabase.app",
+
+            projectId: "funny-legends",
+
+            storageBucket: "funny-legends.firebasestorage.app",
+
+            messagingSenderId: "997341264073",
+
+            appId: "1:997341264073:web:499b58763a9d8f98cdb518",
+
+            // measurementId: "G-H50S6KHE3Z"
+
+        };
+
+
+        // Initialiser Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
+        window.vote = function(id, type) {
+            const voteRef = ref(db, `likes/${id}/${type}`);
+            
+            // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
+            runTransaction(voteRef, (currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+
+            // Lagre lokalt at brukeren har stemt (valgfritt, for å vise aktiv farge)
+            const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+            myVotes[id] = type;
+            localStorage.setItem('myVotes', JSON.stringify(myVotes));
+            oppdaterKnappeStil(id, type);
+        };
+
+        function oppdaterKnappeStil(id, type) {
+            const btn = document.getElementById(`${type}-${id}`);
+            if (btn) btn.classList.add(type === 'heart' ? 'active-heart' : 'active-thumb');
+        }
+
         async function lastInnGalleri() {
             try {
                 const response = await fetch('tegninger.json');
                 const tegninger = await response.json();
                 const galleriContainer = document.getElementById('kunst-galleri');
+                const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
 
-                // Gå gjennom hver tegning i JSON-filen og lag HTML
-                tegninger.forEach(kunst => {
+                tegninger.forEach((kunst) => {
+                    // Lager en unik ID basert på filnavnet (fjerner punktum og spesialtegn for Firebase)
+                    const id = kunst.filnavn.replace(/[^a-zA-Z0-9]/g, "");
+                    
                     const html = `
                         <div class="artwork">
                             <img src="${kunst.filnavn}" alt="${kunst.tittel}">
                             <p class="artwork-title">${kunst.tittel}</p>
                             <p class="artwork-date">${kunst.dato}</p>
+                            
+                            <div class="reactions">
+                                <button id="heart-${id}" class="reaction-btn ${myVotes[id] === 'heart' ? 'active-heart' : ''}" onclick="vote('${id}', 'heart')">
+                                    ❤️ <span id="count-heart-${id}">0</span>
+                                </button>
+                                <button id="thumb-${id}" class="reaction-btn ${myVotes[id] === 'thumb' ? 'active-thumb' : ''}" onclick="vote('${id}', 'thumb')">
+                                    👍 <span id="count-thumb-${id}">0</span>
+                                </button>
+                            </div>
                         </div>
                     `;
                     galleriContainer.innerHTML += html;
+
+                    // Lytt på sanntidsendringer for hvert bilde
+                    const countsRef = ref(db, `likes/${id}`);
+                    onValue(countsRef, (snapshot) => {
+                        const data = snapshot.val();
+                        if (data) {
+                            document.getElementById(`count-heart-${id}`).innerText = data.heart || 0;
+                            document.getElementById(`count-thumb-${id}`).innerText = data.thumb || 0;
+                        }
+                    });
                 });
             } catch (error) {
-                console.error("Kunne ikke laste inn tegninger:", error);
-                document.getElementById('kunst-galleri').innerHTML = "<p>Beklager, kunne ikke laste inn bildene akkurat nå.</p>";
+                console.error("Feil:", error);
+                document.getElementById('kunst-galleri').innerHTML = "<p>Kunne ikke laste galleriet.</p>";
             }
         }
 
-        // Start hentingen når siden åpnes
         lastInnGalleri();
     </script>
 
+    <footer class="main-footer">
+    <div class="footer-content">
+        <p>&copy; 2026 Funny Legends</p>
+        <nav class="footer-nav">
+            <a href="#" onclick="alert('Personvern: Det jobbes med å implementere Firebase for å telle stemmer og LocalStorage (lagring av cookies) for å huske valgene dine. Ingen personlig info selges videre.')">Personvern & Cookies</a>
+        </nav>
+    </div>
+</footer>
 </body>
 </html>
