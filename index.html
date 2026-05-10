@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sønnens Kunstgalleri</title>
     <style>
-        /* Grunnleggende design for siden */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f4f4f9;
@@ -15,21 +14,11 @@
             text-align: center;
         }
 
-        h1 {
-            color: #2c3e50;
-            font-size: 2.5em;
-            margin-bottom: 5px;
-        }
+        h1 { color: #2c3e50; font-size: 2.5em; margin-bottom: 5px; }
+        .intro-text { color: #666; margin-bottom: 40px; }
 
-        .intro-text {
-            color: #666;
-            margin-bottom: 40px;
-        }
-
-        /* Dette lager rutenettet (griden) for bildene */
         .gallery {
             display: grid;
-            /* Gjør at bildene legger seg pent ved siden av hverandre og bryter linjen automatisk på små skjermer */
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             max-width: 1100px;
@@ -37,74 +26,61 @@
             padding: 0 20px;
         }
 
-        /* Design for hver enkelt tegning/ramme */
         .artwork {
             background: white;
             padding: 15px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease;
         }
 
-        /* Liten animasjon når du holder musen over bildet */
-        .artwork:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
+        .artwork:hover { transform: translateY(-5px); }
 
         .artwork img {
             width: 100%;
             height: auto;
             border-radius: 8px;
-            border: 1px solid #eee;
         }
 
-        /* Design for tittel og dato under bildet */
-        .artwork-title {
-            margin: 15px 0 5px 0;
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #444;
-        }
-
-        .artwork-date {
-            font-size: 0.9em;
-            color: #888;
-            margin: 0;
-        }
+        .artwork-title { margin: 15px 0 5px 0; font-size: 1.2em; font-weight: bold; }
+        .artwork-date { font-size: 0.9em; color: #888; margin: 0; }
     </style>
 </head>
 <body>
 
     <h1>🎨 Kunstgalleriet 🎨</h1>
-    <p class="intro-text">En samling av de fineste mesterverkene</p>
+    <p class="intro-text">En dynamisk samling av mesterverk</p>
 
-    <!-- Her starter selve bildegalleriet -->
-    <div class="gallery">
-        
-        <!-- Tegning 1 -->
-        <div class="artwork">
-            <!-- Bytt ut 'tegning1.jpg' med filnavnet til ditt bilde -->
-            <img src="tegning1.jpg" alt="En tegning av en superhelt">
-            <p class="artwork-title">Superhelten</p>
-            <p class="artwork-date">Mai 2026</p>
-        </div>
+    <div class="gallery" id="kunst-galleri"></div>
 
-        <!-- Tegning 2 -->
-        <div class="artwork">
-            <img src="tegning2.jpg" alt="En tegning av et romskip">
-            <p class="artwork-title">Reisen til Mars</p>
-            <p class="artwork-date">April 2026</p>
-        </div>
+    <script>
+        // Funksjon som henter data fra JSON-filen
+        async function lastInnGalleri() {
+            try {
+                const response = await fetch('tegninger.json');
+                const tegninger = await response.json();
+                const galleriContainer = document.getElementById('kunst-galleri');
 
-        <!-- Tegning 3 -->
-        <div class="artwork">
-            <img src="tegning3.jpg" alt="En tegning av familiens hund">
-            <p class="artwork-title">Hunden vår</p>
-            <p class="artwork-date">Mars 2026</p>
-        </div>
+                // Gå gjennom hver tegning i JSON-filen og lag HTML
+                tegninger.forEach(kunst => {
+                    const html = `
+                        <div class="artwork">
+                            <img src="${kunst.filnavn}" alt="${kunst.tittel}">
+                            <p class="artwork-title">${kunst.tittel}</p>
+                            <p class="artwork-date">${kunst.dato}</p>
+                        </div>
+                    `;
+                    galleriContainer.innerHTML += html;
+                });
+            } catch (error) {
+                console.error("Kunne ikke laste inn tegninger:", error);
+                document.getElementById('kunst-galleri').innerHTML = "<p>Beklager, kunne ikke laste inn bildene akkurat nå.</p>";
+            }
+        }
 
-    </div>
+        // Start hentingen når siden åpnes
+        lastInnGalleri();
+    </script>
 
 </body>
 </html>
