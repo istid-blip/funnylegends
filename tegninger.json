@@ -1,12 +1,19 @@
 [
   {
-    "filnavn": "cat.jpeg",
-    "tittel": "Cat",
-    "dato": "April 2026"
+    "filnavn": "gangsterdog.jpeg",
+    "tittel": "Gangster Dog",
+    "dato": "Mai 2026"
   },
-  {
+
+    {
     "filnavn": "gogogaga.jpeg",
     "tittel": "Gogogaga",
+    "dato": "April 2026"
+  },
+
+    {
+    "filnavn": "cat.jpeg",
+    "tittel": "Cat",
     "dato": "April 2026"
   }
 ]
