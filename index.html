@@ -145,6 +145,12 @@
         window.vote = function(id, type) {
             const voteRef = ref(db, `likes/${id}/${type}`);
             
+// Sjekk om bildet allerede har en registrert stemme
+    if (myVotes[id]) {
+        console.log("Du har allerede stemt på dette bildet.");
+        return; // Avbryter funksjonen her
+    }
+
             // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
             runTransaction(voteRef, (currentCount) => {
                 return (currentCount || 0) + 1;
@@ -162,6 +168,8 @@
             if (btn) btn.classList.add(type === 'heart' ? 'active-heart' : 'active-thumb');
         }
 
+        
+
         async function lastInnGalleri() {
             try {
                 const response = await fetch('tegninger.json');
@@ -169,10 +177,14 @@
                 const galleriContainer = document.getElementById('kunst-galleri');
                 const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
 
+
+                
                 tegninger.forEach((kunst) => {
                     // Lager en unik ID basert på filnavnet (fjerner punktum og spesialtegn for Firebase)
                     const id = kunst.filnavn.replace(/[^a-zA-Z0-9]/g, "");
-                    
+                    const harStemt = myVotes[id] ? "disabled" : "";
+
+
                     const html = `
                         <div class="artwork">
                             <img src="${kunst.filnavn}" alt="${kunst.tittel}">
