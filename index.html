@@ -68,44 +68,60 @@
 
         .reactions {
             display: flex;
-            /* Skjuler knappene. Bytt til 'flex' når du vil vise dem igjen! */
             justify-content: center;
-            gap: 15px;
+            /* Litt mer luft mellom knappene nå som de ikke har bakgrunn */
+            gap: 20px; 
+            margin-top: 5px;
         }
 
         .reaction-btn {
-            background: #f0f0f0;
+            /* ENDRET: Fjernet bakgrunn, ramme og avrunding */
+            background: transparent;
             border: none;
-            border-radius: 20px;
-            padding: 6px 12px;
-            font-size: 0.9em;
+            border-radius: 0;
+            
+            /* ENDRET: Mindre padding, mest for å gi litt rom rundt ikonet */
+            padding: 5px;
+            
+            /* Litt større ikoner som standard */
+            font-size: 1em; 
             cursor: pointer;
-            transition: all 0.2s;
+            
+            /* Myk overgang for forstørrelsen */
+            transition: all 0.2s ease-in-out; 
             display: flex;
             align-items: center;
-            gap: 6px;
-        }
-
-        .reaction-btn:hover {
-            background: #e8e8e8;
-            transform: translateY(-2px);
+            gap: 8px;
+            
+            /* Default farge på tallet */
+            color: #777; 
         }
 
         .reaction-btn span {
-            font-weight: bold;
-            color: #555;
+            font-weight: 500;
         }
 
-        /* Aktive stiler når brukeren har trykket */
-        .active-heart {
-            background: #ffebee !important;
-            border: 1px solid #ffcdd2;
+        /* ENDRET: Hover-effekt er nå subtil forstørrelse */
+        .reaction-btn:hover {
+            background: transparent; /* Sikrer ingen bakgrunn */
+            transform: scale(1.15); /* Forstørrer ikonet litt */
         }
 
+        /* ENDRET: Stiler når brukeren har trykket (subtilt, uten pill-farge) */
+        .active-heart,
         .active-thumb {
-            background: #e3f2fd !important;
-            border: 1px solid #bbdefb;
+            background: transparent !important; /* Ingen bakgrunnsfarge */
+            border: none !important; /* Ingen kantlinje */
+            transform: scale(1.05); /* Litt større permanent */
+            color: #333 !important; /* Mørkere tall */
         }
+        
+        /* Gjør tallene litt feitere når valgt */
+        .active-heart span,
+        .active-thumb span {
+            font-weight: 700;
+        }
+
 
         .main-footer {
             margin-top: 50px;
@@ -145,27 +161,24 @@
 
     <div class="gallery" id="kunst-galleri"></div>
 
-    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        // Your web app's Firebase configuration
 
-        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-
-const firebaseConfig = {
-    apiKey: "AIzaSyDHI0z10pfh0mDOjNeqBud07QXdIgy0cM4",
-    databaseURL: "https://funny-legends-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "funny-legends",
-    appId: "1:997341264073:web:499b58763a9d8f98cdb518"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDHI0z10pfh0mDOjNeqBud07QXdIgy0cM4",
+            databaseURL: "https://funny-legends-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "funny-legends",
+            appId: "1:997341264073:web:499b58763a9d8f98cdb518"
+        };
 
 
         // Initialiser Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        
         // Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
-        window.vote = function (id, type) {
+        window.vote = async function (id, type) {
             // 1. Hent myVotes fra localStorage FØRST
             const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
 
@@ -177,15 +190,21 @@ const firebaseConfig = {
 
             const voteRef = ref(db, `likes/${id}/${type}`);
 
-            // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
-            runTransaction(voteRef, (currentCount) => {
-                return (currentCount || 0) + 1;
-            });
+            try {
+                // Venter på at Firebase bekrefter lagringen før vi går videre
+                await runTransaction(voteRef, (currentCount) => {
+                    return (currentCount || 0) + 1;
+                });
 
-            // Lagre lokalt at brukeren har stemt
-            myVotes[id] = type;
-            localStorage.setItem('myVotes', JSON.stringify(myVotes));
-            oppdaterKnappeStil(id, type);
+                // FØRST når Firebase har godkjent, lagrer vi lokalt at du har stemt
+                myVotes[id] = type;
+                localStorage.setItem('myVotes', JSON.stringify(myVotes));
+                oppdaterKnappeStil(id, type);
+                
+            } catch (error) {
+                // Hvis Firebase avviser (f.eks. pga. sikkerhetsregler), vises feilen her
+                console.error("Transaksjonen feilet:", error);
+            }
         };
 
         function oppdaterKnappeStil(id, type) {
@@ -207,7 +226,6 @@ const firebaseConfig = {
                 tegninger.forEach((kunst) => {
                     // Lager en unik ID basert på filnavnet (fjerner punktum og spesialtegn for Firebase)
                     const id = kunst.filnavn.replace(/[^a-zA-Z0-9]/g, "");
-                    const harStemt = myVotes[id] ? "disabled" : "";
 
 
                     const html = `
@@ -233,8 +251,10 @@ const firebaseConfig = {
                     onValue(countsRef, (snapshot) => {
                         const data = snapshot.val();
                         if (data) {
-                            document.getElementById(`count-heart-${id}`).innerText = data.heart || 0;
-                            document.getElementById(`count-thumb-${id}`).innerText = data.thumb || 0;
+                            const heartSpan = document.getElementById(`count-heart-${id}`);
+                            const thumbSpan = document.getElementById(`count-thumb-${id}`);
+                            if(heartSpan) heartSpan.innerText = data.heart || 0;
+                            if(thumbSpan) thumbSpan.innerText = data.thumb || 0;
                         }
                     });
                 });
