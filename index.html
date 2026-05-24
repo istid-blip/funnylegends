@@ -140,28 +140,29 @@
         // Initialiser Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
-        // Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
-        window.vote = function(id, type) {
-            const voteRef = ref(db, `likes/${id}/${type}`);
-            
-// Sjekk om bildet allerede har en registrert stemme
+// Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
+window.vote = function(id, type) {
+    // 1. Hent myVotes fra localStorage FØRST
+    const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
+    
+    // 2. Sjekk om bildet allerede har en registrert stemme
     if (myVotes[id]) {
         console.log("Du har allerede stemt på dette bildet.");
         return; // Avbryter funksjonen her
     }
 
-            // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
-            runTransaction(voteRef, (currentCount) => {
-                return (currentCount || 0) + 1;
-            });
+    const voteRef = ref(db, `likes/${id}/${type}`);
 
-            // Lagre lokalt at brukeren har stemt (valgfritt, for å vise aktiv farge)
-            const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
-            myVotes[id] = type;
-            localStorage.setItem('myVotes', JSON.stringify(myVotes));
-            oppdaterKnappeStil(id, type);
-        };
+    // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
+    runTransaction(voteRef, (currentCount) => {
+        return (currentCount || 0) + 1;
+    });
+
+    // Lagre lokalt at brukeren har stemt
+    myVotes[id] = type;
+    localStorage.setItem('myVotes', JSON.stringify(myVotes));
+    oppdaterKnappeStil(id, type);
+};
 
         function oppdaterKnappeStil(id, type) {
             const btn = document.getElementById(`${type}-${id}`);
