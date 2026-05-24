@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,8 +15,16 @@
             text-align: center;
         }
 
-        h1 { color: #2c3e50; font-size: 2.5em; margin-bottom: 5px; }
-        .intro-text { color: #666; margin-bottom: 40px; }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 5px;
+        }
+
+        .intro-text {
+            color: #666;
+            margin-bottom: 40px;
+        }
 
         .gallery {
             display: grid;
@@ -30,11 +39,13 @@
             background: white;
             padding: 15px;
             border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
             transition: transform 0.3s ease;
         }
 
-        .artwork:hover { transform: scale(1.01); }
+        .artwork:hover {
+            transform: scale(1.01);
+        }
 
         .artwork img {
             width: 100%;
@@ -42,11 +53,22 @@
             border-radius: 8px;
         }
 
-        .artwork-title { margin: 15px 0 5px 0; font-size: 1.2em; font-weight: bold; }
-        .artwork-date { font-size: 0.9em; color: #888; margin: 0; margin-bottom: 15px; }
-        
+        .artwork-title {
+            margin: 15px 0 5px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .artwork-date {
+            font-size: 0.9em;
+            color: #888;
+            margin: 0;
+            margin-bottom: 15px;
+        }
+
         .reactions {
-            display: flex; /* Skjuler knappene. Bytt til 'flex' når du vil vise dem igjen! */
+            display: flex;
+            /* Skjuler knappene. Bytt til 'flex' når du vil vise dem igjen! */
             justify-content: center;
             gap: 15px;
         }
@@ -64,43 +86,58 @@
             gap: 6px;
         }
 
-        .reaction-btn:hover { background: #e8e8e8; transform: translateY(-2px); }
-        .reaction-btn span { font-weight: bold; color: #555; }
-        
+        .reaction-btn:hover {
+            background: #e8e8e8;
+            transform: translateY(-2px);
+        }
+
+        .reaction-btn span {
+            font-weight: bold;
+            color: #555;
+        }
+
         /* Aktive stiler når brukeren har trykket */
-        .active-heart { background: #ffebee !important; border: 1px solid #ffcdd2; }
-        .active-thumb { background: #e3f2fd !important; border: 1px solid #bbdefb; }
+        .active-heart {
+            background: #ffebee !important;
+            border: 1px solid #ffcdd2;
+        }
+
+        .active-thumb {
+            background: #e3f2fd !important;
+            border: 1px solid #bbdefb;
+        }
 
         .main-footer {
-    margin-top: 50px;
-    padding: 20px;
-    border-top: 1px solid #eee;
-    font-size: 0.9em;
-    color: #888;
-}
+            margin-top: 50px;
+            padding: 20px;
+            border-top: 1px solid #eee;
+            font-size: 0.9em;
+            color: #888;
+        }
 
-.footer-content {
-    max-width: 800px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
 
-.footer-nav a {
-    color: #666;
-    text-decoration: none;
-    margin: 0 10px;
-    transition: color 0.2s;
-}
+        .footer-nav a {
+            color: #666;
+            text-decoration: none;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
 
-.footer-nav a:hover {
-    color: #2c3e50;
-    text-decoration: underline;
-}
+        .footer-nav a:hover {
+            color: #2c3e50;
+            text-decoration: underline;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>🎨 Funny Legends 🎨</h1>
@@ -116,60 +153,47 @@
 
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-        const firebaseConfig = {
-
-            apiKey: "AIzaSyDHI0z10pfh0mDOjNeqBud07QXdIgy0cM4",
-
-            authDomain: "funny-legends.firebaseapp.com",
-
-            databaseURL: "https://funny-legends-default-rtdb.europe-west1.firebasedatabase.app",
-
-            projectId: "funny-legends",
-
-            storageBucket: "funny-legends.firebasestorage.app",
-
-            messagingSenderId: "997341264073",
-
-            appId: "1:997341264073:web:499b58763a9d8f98cdb518",
-
-            // measurementId: "G-H50S6KHE3Z"
-
-        };
+const firebaseConfig = {
+    apiKey: "AIzaSyDHI0z10pfh0mDOjNeqBud07QXdIgy0cM4",
+    databaseURL: "https://funny-legends-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "funny-legends",
+    appId: "1:997341264073:web:499b58763a9d8f98cdb518"
+};
 
 
         // Initialiser Firebase
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-// Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
-window.vote = function(id, type) {
-    // 1. Hent myVotes fra localStorage FØRST
-    const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
-    
-    // 2. Sjekk om bildet allerede har en registrert stemme
-    if (myVotes[id]) {
-        console.log("Du har allerede stemt på dette bildet.");
-        return; // Avbryter funksjonen her
-    }
+        // Funksjon for å stemme (Global funksjon lagt til window så HTML kan nå den)
+        window.vote = function (id, type) {
+            // 1. Hent myVotes fra localStorage FØRST
+            const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
 
-    const voteRef = ref(db, `likes/${id}/${type}`);
+            // 2. Sjekk om bildet allerede har en registrert stemme
+            if (myVotes[id]) {
+                console.log("Du har allerede stemt på dette bildet.");
+                return; // Avbryter funksjonen her
+            }
 
-    // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
-    runTransaction(voteRef, (currentCount) => {
-        return (currentCount || 0) + 1;
-    });
+            const voteRef = ref(db, `likes/${id}/${type}`);
 
-    // Lagre lokalt at brukeren har stemt
-    myVotes[id] = type;
-    localStorage.setItem('myVotes', JSON.stringify(myVotes));
-    oppdaterKnappeStil(id, type);
-};
+            // Bruker transaksjon for å unngå feil hvis mange trykker samtidig
+            runTransaction(voteRef, (currentCount) => {
+                return (currentCount || 0) + 1;
+            });
+
+            // Lagre lokalt at brukeren har stemt
+            myVotes[id] = type;
+            localStorage.setItem('myVotes', JSON.stringify(myVotes));
+            oppdaterKnappeStil(id, type);
+        };
 
         function oppdaterKnappeStil(id, type) {
             const btn = document.getElementById(`${type}-${id}`);
             if (btn) btn.classList.add(type === 'heart' ? 'active-heart' : 'active-thumb');
         }
 
-        
+
 
         async function lastInnGalleri() {
             try {
@@ -179,7 +203,7 @@ window.vote = function(id, type) {
                 const myVotes = JSON.parse(localStorage.getItem('myVotes') || '{}');
 
 
-                
+
                 tegninger.forEach((kunst) => {
                     // Lager en unik ID basert på filnavnet (fjerner punktum og spesialtegn for Firebase)
                     const id = kunst.filnavn.replace(/[^a-zA-Z0-9]/g, "");
@@ -223,10 +247,14 @@ window.vote = function(id, type) {
         lastInnGalleri();
     </script>
 
-    <footer class="main-footer">
+<footer class="main-footer">
     <div class="footer-content">
         <p>&copy; 2026 Funny Legends</p>
+        <div class="footer-nav">
+            <a href="personvern.html">Personvern</a>
+        </div>
     </div>
 </footer>
 </body>
+
 </html>
