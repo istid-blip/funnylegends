@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101e22"><meta name="description" content="Et lite eventyr mens du venter. Fra et leirbål til en fremmed verden – og et mystisk bur i en grotte.">
+<title>Riften · Et eventyr på vent</title><link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="shell">
+<header class="masthead"><a class="wordmark" href="./" aria-label="Riften – forsiden"><svg viewBox="0 0 24 32" aria-hidden="true"><path d="M16 1 6 14l8 2-5 15 13-19-9 1Z" fill="currentColor"/></svg>RIFTEN<span>ET EVENTYR PÅ VENT</span></a><div class="waiting"><span class="pulse"></span>En annen verden, mens du venter</div></header>
+<section class="heading"><div><p class="eyebrow">ET LITE EVENTYR. ET STORT MYSTERIUM.</p><h1>Du skulle bare grille<br class="mobile-break"> en marshmallow.</h1></div><p class="intro">Noen ganger tar ventetiden<br>en uventet vending.</p></section>
+<section class="game" aria-label="Riften – spill" id="game">
+<div class="gamebar"><div class="chapter"><span class="chapter-number" id="chapterNumber">00</span><div><span class="micro">KAPITTEL <span id="chapterLabel">NULL</span></span><strong id="chapterTitle">En stille kveld</strong></div></div><div class="toolbar"><button id="sound" aria-pressed="false" title="Slå på lyd"><span aria-hidden="true">♪</span><span id="soundLabel">Lyd av</span></button><button id="pause" disabled title="Pause (P)"><span aria-hidden="true">Ⅱ</span><span id="pauseLabel">Pause</span></button><button id="fullscreen" title="Fullskjerm" aria-label="Fullskjerm">⛶</button></div></div>
+<div class="stage" id="stage">
+<canvas id="world" width="960" height="540" tabindex="0" aria-label="Spillområde sett ovenfra. Bruk piltaster eller WASD for å gå og E for å undersøke. Brevet ligger utenfor burets høyre side."></canvas>
+<div class="scene-label" id="location"><span></span> ET STED I SKOGEN</div>
+<div class="welcome" id="welcome"><div class="welcome-copy"><span class="small-rule"></span><p class="eyebrow">ALLE EVENTYR BEGYNNER ET STED</p><h2>Dette var ikke<br>en del av planen.</h2><p>Et bål. En stille kveld.<br>Og noe som venter på den andre siden.</p><button class="gold-button" id="start">Begynn eventyret <span>→</span></button><button class="quiet-button" id="continue" hidden>Fortsett i grotten →</button><span class="welcome-note">Spill i ditt tempo · Kan pauses når som helst</span></div></div>
+<div class="cinematic" id="cinematic" hidden><div class="scene-count" id="sceneCount">01 / 04</div><button class="skip" id="skip">Hopp over intro <span>↗</span></button><div class="subtitle"><p id="subtitle"></p><div class="scene-progress"><span id="sceneProgress"></span></div></div></div>
+<div class="wake-text" id="wakeText" hidden>Hvor … er jeg?</div>
+<div class="interact-wrap" id="interactWrap" hidden><button id="interact"><kbd>E</kbd><span id="interactText">Undersøk</span></button></div>
+<div class="pause-screen" id="pauseScreen" hidden><span class="eyebrow">EVENTYRET VENTER PÅ DEG</span><h2>Et lite pusterom.</h2><p>Fortsett når du er klar.</p><button class="gold-button" id="resume">Tilbake til eventyret <span>→</span></button><button class="quiet-button" id="restart">Se åpningen på nytt</button></div>
+<div class="fade" id="fade"></div>
+<div class="toast" id="toast" role="status" hidden></div>
+</div>
+<div class="game-footer"><div class="objective"><span class="objective-icon" aria-hidden="true">◇</span><div><span class="micro">DITT NESTE STEG</span><p id="objective">Finn ut hva som venter på den andre siden.</p></div></div><button class="inventory" id="inventory" disabled><span aria-hidden="true">▱</span><span id="inventoryLabel">Tomme lommer</span><span class="inventory-count" id="inventoryCount">0</span></button></div>
+<div class="touch-controls" id="touchControls"><div class="dpad"><button data-dir="up" class="up" aria-label="Gå opp">↑</button><button data-dir="left" class="left" aria-label="Gå til venstre">←</button><button data-dir="down" class="down" aria-label="Gå ned">↓</button><button data-dir="right" class="right" aria-label="Gå til høyre">→</button></div><button class="touch-action" id="touchAction" disabled>Undersøk <span>✧</span></button></div>
+</section>
+<div class="under-game"><div class="controls-legend"><span><kbd>W</kbd><span class="wasd">A S D</span> / piltaster <b>Beveg deg</b></span><span><kbd>E</kbd><b>Undersøk</b></span><span><kbd>P</kbd><b>Pause</b></span></div><span class="save-note"><span></span> Fremgangen lagres på denne enheten</span></div>
+<footer class="page-footer"><span>En liten pause fra virkeligheten.</span><span>RIFTEN <i>✦</i> KAPITTEL 01</span></footer>
+</main>
+<dialog id="letterDialog" class="evidence-dialog" aria-labelledby="letterTitle">
+<div class="letter-top"><div><span class="eyebrow">FUNNET VED BURET</span><h2 id="letterTitle">Brevet</h2></div><button id="closeLetter" aria-label="Lukk brevet">×</button></div>
+<figure class="letter-evidence" id="letterContent"><div class="letter-photo-frame"><img class="letter-photo" src="assets/brevet.jpeg" width="2048" height="1536" alt="Et revet brev med utydelige, overstrøkne skriblerier. Bare ALONE og ??? kan tydes. Et sølvfarget kjede med et kors ligger oppe til høyre på brevet."></div><figcaption>Du klarer bare å tyde <strong>ALONE</strong> og <strong>???</strong>.</figcaption></figure>
+<div class="letter-bottom"><span id="letterNote">Resten av skriften er uleselig.</span><button class="gold-button" id="backToGame">Tilbake til grotten <span>→</span></button></div>
+</dialog>
+<script src="game.js"></script>
+</body></html>
